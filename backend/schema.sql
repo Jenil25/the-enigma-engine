@@ -240,10 +240,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- =============================================
--- 2. FUNCTIONS
--- =============================================
-
 DELIMITER //
 CREATE FUNCTION f_CalculateBookingTotal(p_roomID INT, p_numPlayers INT) 
 RETURNS DECIMAL(10,2)
@@ -255,16 +251,12 @@ BEGIN
     SELECT pricePerPerson INTO v_price FROM Rooms WHERE roomID = p_roomID;
     
     IF v_price IS NULL THEN
-        SET v_price = 25.00; -- Default fallback
+        SET v_price = 25.00;
     END IF;
     
     RETURN v_price * p_numPlayers;
 END //
 DELIMITER ;
-
--- =============================================
--- 3. TRIGGERS
--- =============================================
 
 DELIMITER //
 CREATE TRIGGER tr_AfterPayment
@@ -285,9 +277,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- =============================================
--- 4. VIEWS
--- =============================================
 
 CREATE OR REPLACE VIEW v_CustomerBookings AS
 SELECT 

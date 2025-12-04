@@ -45,7 +45,7 @@ export default function AdminDashboard() {
             <div className="relative z-10 max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-12">
                     <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
-                        Command Center
+                        Admin Dashboard
                     </h1>
                     <button
                         onClick={() => router.push('/admin/staff')}
