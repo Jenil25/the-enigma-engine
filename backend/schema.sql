@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS Rooms (
     description TEXT,
     difficultyLevel INT CHECK (difficultyLevel BETWEEN 1 AND 10),
     maxPlayers INT,
-    durationMinutes INT
+    durationMinutes INT,
+    pricePerPerson DECIMAL(10, 2) DEFAULT 25.00
 );
 
 -- Puzzles Table (Parent)
@@ -142,3 +143,164 @@ CREATE TABLE IF NOT EXISTS Reviews (
     commentText TEXT,
     FOREIGN KEY (bookingID) REFERENCES Bookings(bookingID)
 );
+
+-- =============================================
+-- 1. STORED PROCEDURES
+-- =============================================
+
+-- Register User (Handles Users + Customers/Staff tables)
+DELIMITER //
+CREATE PROCEDURE sp_RegisterUser(
+    IN p_email VARCHAR(255),
+    IN p_hashedPassword VARCHAR(255),
+    IN p_firstName VARCHAR(100),
+    IN p_lastName VARCHAR(100),
+    IN p_phone VARCHAR(20),
+    IN p_role VARCHAR(20), -- 'Customer', 'Admin', 'GameMaster'
+    OUT p_userID INT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
+    -- Insert into Users
+    INSERT INTO Users (email, hashedPassword, firstName, lastName, phone)
+    VALUES (p_email, p_hashedPassword, p_firstName, p_lastName, p_phone);
+    
+    SET p_userID = LAST_INSERT_ID();
+
+    -- Insert into Child Table
+    IF p_role = 'Customer' THEN
+        INSERT INTO Customers (userID, loyaltyPoints) VALUES (p_userID, 0);
+    ELSEIF p_role IN ('Admin', 'GameMaster') THEN
+        INSERT INTO Staff (userID, role, hireDate, payRate) 
+        VALUES (p_userID, p_role, CURDATE(), 0.00);
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid Role';
+    END IF;
+
+    COMMIT;
+END //
+DELIMITER ;
+
+-- Create Booking (Handles Availability, Booking, Invoice)
+DELIMITER //
+CREATE PROCEDURE sp_CreateBooking(
+    IN p_customerID INT,
+    IN p_roomID INT,
+    IN p_scheduledTime DATETIME,
+    IN p_numPlayers INT,
+    OUT p_bookingID INT,
+    OUT p_invoiceID INT
+)
+BEGIN
+    DECLARE v_count INT;
+    DECLARE v_totalAmount DECIMAL(10,2);
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
+    -- 1. Check Availability
+    SELECT COUNT(*) INTO v_count 
+    FROM Bookings 
+    WHERE roomID = p_roomID 
+      AND scheduledTime = p_scheduledTime 
+      AND status != 'Cancelled';
+      
+    IF v_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Room not available';
+    END IF;
+
+    -- 2. Create Booking
+    INSERT INTO Bookings (customerID, roomID, scheduledTime, numPlayers, status)
+    VALUES (p_customerID, p_roomID, p_scheduledTime, p_numPlayers, 'Confirmed');
+    
+    SET p_bookingID = LAST_INSERT_ID();
+
+    -- 3. Calculate Total Amount using Function
+    SET v_totalAmount = f_CalculateBookingTotal(p_roomID, p_numPlayers);
+
+    -- 4. Create Invoice
+    INSERT INTO Invoices (bookingID, amountDue, status)
+    VALUES (p_bookingID, v_totalAmount, 'Pending');
+    
+    SET p_invoiceID = LAST_INSERT_ID();
+
+    COMMIT;
+END //
+DELIMITER ;
+
+-- =============================================
+-- 2. FUNCTIONS
+-- =============================================
+
+DELIMITER //
+CREATE FUNCTION f_CalculateBookingTotal(p_roomID INT, p_numPlayers INT) 
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE v_price DECIMAL(10,2);
+    
+    SELECT pricePerPerson INTO v_price FROM Rooms WHERE roomID = p_roomID;
+    
+    IF v_price IS NULL THEN
+        SET v_price = 25.00; -- Default fallback
+    END IF;
+    
+    RETURN v_price * p_numPlayers;
+END //
+DELIMITER ;
+
+-- =============================================
+-- 3. TRIGGERS
+-- =============================================
+
+DELIMITER //
+CREATE TRIGGER tr_AfterPayment
+AFTER INSERT ON Payments
+FOR EACH ROW
+BEGIN
+    -- 1. Update Invoice Status to 'Paid'
+    UPDATE Invoices 
+    SET status = 'Paid' 
+    WHERE invoiceID = NEW.invoiceID;
+
+    -- 2. Add Loyalty Points (10 points per payment)
+    UPDATE Customers c
+    JOIN Bookings b ON c.userID = b.customerID
+    JOIN Invoices i ON b.bookingID = i.bookingID
+    SET c.loyaltyPoints = c.loyaltyPoints + 10
+    WHERE i.invoiceID = NEW.invoiceID;
+END //
+DELIMITER ;
+
+-- =============================================
+-- 4. VIEWS
+-- =============================================
+
+CREATE OR REPLACE VIEW v_CustomerBookings AS
+SELECT 
+    b.bookingID,
+    b.customerID,
+    r.name AS roomName,
+    b.scheduledTime,
+    b.status AS bookingStatus,
+    i.invoiceID,
+    i.amountDue,
+    i.status AS invoiceStatus
+FROM Bookings b
+JOIN Rooms r ON b.roomID = r.roomID
+LEFT JOIN Invoices i ON b.bookingID = i.bookingID
+ORDER BY b.scheduledTime DESC;
+

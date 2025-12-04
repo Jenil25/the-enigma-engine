@@ -1,21 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function Home() {
     return (
         <main className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
-            {/* Background Image */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/images/bg-hero.png"
-                    alt="Enigma Engine Background"
-                    fill
-                    className="object-cover opacity-60"
-                    priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-slate-950" />
-            </div>
-
             <div className="relative z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex flex-col text-center">
                 <h1 className="text-6xl md:text-8xl font-extrabold mb-6 tracking-tighter">
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">THE ENIGMA</span>

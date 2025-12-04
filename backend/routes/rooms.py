@@ -24,7 +24,6 @@ def get_room(room_id):
         cursor.execute("SELECT * FROM Rooms WHERE roomID = %s", (room_id,))
         room = cursor.fetchone()
         if room:
-            # Get Puzzles for this room
             cursor.execute("SELECT * FROM Puzzles WHERE roomID = %s", (room_id,))
             puzzles = cursor.fetchall()
             room['puzzles'] = puzzles
@@ -91,8 +90,6 @@ def delete_room(room_id):
     finally:
         cursor.close()
 
-# --- Puzzle Routes (Nested under rooms) ---
-
 @rooms_bp.route('/<int:room_id>/puzzles', methods=['POST'])
 def create_puzzle(room_id):
     data = request.json
@@ -104,14 +101,12 @@ def create_puzzle(room_id):
     db = get_db()
     cursor = db.cursor()
     try:
-        # 1. Insert into Parent Puzzles Table
         cursor.execute(
             "INSERT INTO Puzzles (roomID, name, description, puzzleType) VALUES (%s, %s, %s, %s)",
             (room_id, data['name'], data.get('description'), puzzle_type)
         )
         puzzle_id = cursor.lastrowid
 
-        # 2. Insert into Child Table
         if puzzle_type == 'Physical':
             cursor.execute(
                 "INSERT INTO Physical_Puzzles (puzzleID, resetInstructions, requiredPropID) VALUES (%s, %s, %s)",

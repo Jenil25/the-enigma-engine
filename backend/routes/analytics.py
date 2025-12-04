@@ -5,12 +5,11 @@ analytics_bp = Blueprint('analytics', __name__)
 
 @analytics_bp.route('/revenue', methods=['GET'])
 def get_revenue_report():
-    # Monthly Revenue by Room
     db = get_db()
     cursor = db.cursor()
     try:
         query = """
-            SELECT r.name as roomName, DATE_FORMAT(p.transactionTimestamp, '%%Y-%%m') as month, SUM(p.amountPaid) as totalRevenue
+            SELECT r.name as roomName, DATE_FORMAT(p.transactionTimestamp, '%Y-%m') as month, SUM(p.amountPaid) as totalRevenue
             FROM Payments p
             JOIN Invoices i ON p.invoiceID = i.invoiceID
             JOIN Bookings b ON i.bookingID = b.bookingID
@@ -28,7 +27,6 @@ def get_revenue_report():
 
 @analytics_bp.route('/performance', methods=['GET'])
 def get_performance_stats():
-    # Success Rate vs Team Size
     db = get_db()
     cursor = db.cursor()
     try:

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { fetchClient } from '@/utils/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -22,7 +21,15 @@ export default function LoginPage() {
             });
 
             localStorage.setItem('user', JSON.stringify(data.user));
-            router.push('/dashboard');
+            console.log("data:", data);
+            if (data.user.role == "Customer") {
+                router.push('/dashboard');
+            } else if (data.user.role == "GameMaster") {
+                router.push('/gamemaster');
+            } else {
+                router.push('/admin');
+            }
+
         } catch (err: any) {
             setError(err.message);
         }
@@ -30,17 +37,6 @@ export default function LoginPage() {
 
     return (
         <div className="relative min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden">
-            {/* Background */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/images/bg-auth.png"
-                    alt="Auth Background"
-                    fill
-                    className="object-cover opacity-40"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-slate-950" />
-            </div>
-
             <div className="relative z-10 w-full max-w-md">
                 <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 shadow-2xl p-8 rounded-2xl">
                     <h1 className="text-4xl font-bold text-center mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">

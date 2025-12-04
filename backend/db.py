@@ -39,7 +39,6 @@ def init_db():
     cursor = db.cursor()
     try:
         with open('schema.sql', 'r') as f:
-            # Read the entire file and split by semicolon to get individual statements
             sql_script = f.read()
             statements = sql_script.split(';')
             for statement in statements:

@@ -3,12 +3,10 @@
 import { useEffect, useState } from 'react';
 import { fetchClient } from '@/utils/api';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 
 export default function AdminDashboard() {
     const [revenue, setRevenue] = useState<any[]>([]);
     const [performance, setPerformance] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
 
@@ -37,8 +35,6 @@ export default function AdminDashboard() {
             setPerformance(perfData);
         } catch (error) {
             console.error(error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -46,24 +42,20 @@ export default function AdminDashboard() {
 
     return (
         <div className="relative min-h-screen p-8 md:p-24 bg-slate-950 text-white">
-            {/* Background */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/images/bg-dashboard.png"
-                    alt="Admin Background"
-                    fill
-                    className="object-cover opacity-20"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 to-slate-950" />
-            </div>
-
             <div className="relative z-10 max-w-7xl mx-auto">
-                <h1 className="text-4xl font-bold mb-12 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
-                    Command Center
-                </h1>
+                <div className="flex justify-between items-center mb-12">
+                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
+                        Command Center
+                    </h1>
+                    <button
+                        onClick={() => router.push('/admin/staff')}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-purple-900/20"
+                    >
+                        Manage Staff
+                    </button>
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                    {/* Revenue Report */}
                     <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 shadow-2xl p-8 rounded-2xl">
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
                             <span className="text-green-400">💰</span> Monthly Revenue
@@ -90,7 +82,6 @@ export default function AdminDashboard() {
                         </div>
                     </div>
 
-                    {/* Performance Stats */}
                     <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 shadow-2xl p-8 rounded-2xl">
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
                             <span className="text-blue-400">📊</span> Success Rates

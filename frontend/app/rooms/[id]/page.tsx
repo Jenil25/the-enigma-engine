@@ -38,7 +38,6 @@ export default function RoomDetailsPage() {
 
                 <div className="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800">
                     <div className="h-64 bg-slate-800 flex items-center justify-center">
-                        {/* Placeholder for Hero Image */}
                         <span className="text-6xl">🕵️‍♂️</span>
                     </div>
 

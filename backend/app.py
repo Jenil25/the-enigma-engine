@@ -6,6 +6,7 @@ from routes.rooms import rooms_bp
 from routes.bookings import bookings_bp
 from routes.sessions import sessions_bp
 from routes.analytics import analytics_bp
+from routes.staff import staff_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -16,6 +17,7 @@ app.register_blueprint(rooms_bp, url_prefix='/api/rooms')
 app.register_blueprint(bookings_bp, url_prefix='/api/bookings')
 app.register_blueprint(sessions_bp, url_prefix='/api/sessions')
 app.register_blueprint(analytics_bp, url_prefix='/api/analytics')
+app.register_blueprint(staff_bp, url_prefix='/api/staff')
 
 @app.route('/')
 def hello():

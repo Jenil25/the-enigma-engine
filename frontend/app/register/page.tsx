@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { fetchClient } from '@/utils/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function RegisterPage() {
     const [formData, setFormData] = useState({
@@ -13,7 +12,8 @@ export default function RegisterPage() {
         firstName: '',
         lastName: '',
         phone: '',
-        role: 'Customer'
+        role: 'Customer',
+        registrationCode: ''
     });
     const [error, setError] = useState('');
     const router = useRouter();
@@ -26,9 +26,16 @@ export default function RegisterPage() {
         e.preventDefault();
         setError('');
         try {
+            let role = 'Customer';
+            if (formData.registrationCode === 'ENIGMA_ADMIN') {
+                role = 'Admin';
+            } else if (formData.registrationCode === 'ENIGMA_GM') {
+                role = 'GameMaster';
+            }
+
             await fetchClient('/register', {
                 method: 'POST',
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ ...formData, role }),
             });
 
             router.push('/login');
@@ -39,17 +46,6 @@ export default function RegisterPage() {
 
     return (
         <div className="relative min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden">
-            {/* Background */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/images/bg-auth.png"
-                    alt="Auth Background"
-                    fill
-                    className="object-cover opacity-40"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-slate-950" />
-            </div>
-
             <div className="relative z-10 w-full max-w-lg">
                 <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 shadow-2xl p-8 rounded-2xl">
                     <h1 className="text-4xl font-bold text-center mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
@@ -125,17 +121,16 @@ export default function RegisterPage() {
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-slate-300">Role</label>
-                            <select
-                                name="role"
-                                value={formData.role}
+                            <label className="block mb-1 text-sm font-medium text-slate-300">Registration Code (Optional)</label>
+                            <input
+                                type="text"
+                                name="registrationCode"
+                                value={formData.registrationCode}
                                 onChange={handleChange}
-                                className="w-full p-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-purple-500 outline-none transition-all text-white"
-                            >
-                                <option value="Customer">Customer</option>
-                                <option value="GameMaster">Game Master</option>
-                                <option value="Admin">Admin</option>
-                            </select>
+                                placeholder="Leave empty for Customer"
+                                className="w-full p-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-purple-500 outline-none transition-all text-white placeholder-slate-600"
+                            />
+                            <p className="text-xs text-slate-500 mt-1">Enter staff code if applicable.</p>
                         </div>
 
                         <button

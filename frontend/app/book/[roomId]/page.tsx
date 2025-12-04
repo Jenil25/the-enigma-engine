@@ -13,7 +13,6 @@ export default function BookingPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    // Mock user ID (In a real app, get from context/auth)
     const [userId, setUserId] = useState<number | null>(null);
 
     useEffect(() => {
@@ -39,7 +38,7 @@ export default function BookingPage() {
 
         try {
             const scheduledTime = `${date} ${time}:00`;
-            await fetchClient('/bookings', {
+            await fetchClient('/bookings/', {
                 method: 'POST',
                 body: JSON.stringify({
                     customerId: userId,

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { fetchClient } from '@/utils/api';
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface Room {
     roomID: number;
@@ -19,7 +18,7 @@ export default function RoomsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchClient('/rooms')
+        fetchClient('/rooms/')
             .then(setRooms)
             .catch(console.error)
             .finally(() => setLoading(false));
@@ -33,17 +32,6 @@ export default function RoomsPage() {
 
     return (
         <div className="relative min-h-screen p-8 md:p-24 bg-slate-950 text-white overflow-hidden">
-            {/* Background */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/images/bg-rooms.png"
-                    alt="Rooms Background"
-                    fill
-                    className="object-cover opacity-30"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/90 to-slate-950" />
-            </div>
-
             <div className="relative z-10 max-w-7xl mx-auto">
                 <div className="text-center mb-16">
                     <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
