@@ -64,20 +64,21 @@ CREATE TABLE IF NOT EXISTS Digital_Puzzles (
 
 -- Puzzle Hints
 CREATE TABLE IF NOT EXISTS Puzzle_Hints (
-    hintID INT AUTO_INCREMENT PRIMARY KEY,
-    puzzleID INT,
+    puzzleID INT NOT NULL,
+    hintSequence INT NOT NULL,
     hintText TEXT,
     timeToTriggerSeconds INT,
+    PRIMARY KEY (puzzleID, hintSequence),
     FOREIGN KEY (puzzleID) REFERENCES Puzzles(puzzleID) ON DELETE CASCADE
 );
 
 -- Room Availability
 CREATE TABLE IF NOT EXISTS Room_Availability (
-    availabilityID INT AUTO_INCREMENT PRIMARY KEY,
-    roomID INT,
-    dayOfWeek ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
-    openTime TIME,
-    closeTime TIME,
+    roomID INT NOT NULL,
+    dayOfWeek ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+    openTime TIME NOT NULL,
+    closeTime TIME NOT NULL,
+    PRIMARY KEY (roomID, dayOfWeek, openTime),
     FOREIGN KEY (roomID) REFERENCES Rooms(roomID) ON DELETE CASCADE
 );
 
@@ -128,20 +129,20 @@ CREATE TABLE IF NOT EXISTS Game_Sessions (
 -- Session Hints Used
 CREATE TABLE IF NOT EXISTS Session_Hints_Used (
     sessionHintID INT AUTO_INCREMENT PRIMARY KEY,
-    sessionID INT,
-    hintID INT,
-    timestampHintGiven DATETIME,
-    FOREIGN KEY (sessionID) REFERENCES Game_Sessions(sessionID),
-    FOREIGN KEY (hintID) REFERENCES Puzzle_Hints(hintID)
+    sessionID INT NOT NULL,
+    puzzleID INT NOT NULL,
+    hintSequence INT NOT NULL,
+    timestampHintGiven DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sessionID) REFERENCES Game_Sessions(sessionID) ON DELETE CASCADE,
+    FOREIGN KEY (puzzleID, hintSequence) REFERENCES Puzzle_Hints(puzzleID, hintSequence) ON DELETE CASCADE
 );
 
 -- Reviews
 CREATE TABLE IF NOT EXISTS Reviews (
-    reviewID INT AUTO_INCREMENT PRIMARY KEY,
-    bookingID INT,
+    bookingID INT PRIMARY KEY,
     rating INT CHECK (rating BETWEEN 1 AND 5),
     commentText TEXT,
-    FOREIGN KEY (bookingID) REFERENCES Bookings(bookingID)
+    FOREIGN KEY (bookingID) REFERENCES Bookings(bookingID) ON DELETE CASCADE
 );
 
 -- =============================================

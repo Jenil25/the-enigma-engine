@@ -73,6 +73,29 @@ SET @room1_id = (SELECT roomID FROM Rooms WHERE name = 'The Haunted Mansion');
 SET @room2_id = (SELECT roomID FROM Rooms WHERE name = 'Cyberpunk Heist');
 SET @room3_id = (SELECT roomID FROM Rooms WHERE name = 'Pirate\'s Cove');
 
+-- 3.5. Insert Room Availability schedules
+INSERT INTO Room_Availability (roomID, dayOfWeek, openTime, closeTime) VALUES
+-- Haunted Mansion - Open all week
+(@room1_id, 'Monday', '10:00:00', '22:00:00'),
+(@room1_id, 'Tuesday', '10:00:00', '22:00:00'),
+(@room1_id, 'Wednesday', '10:00:00', '22:00:00'),
+(@room1_id, 'Thursday', '10:00:00', '22:00:00'),
+(@room1_id, 'Friday', '10:00:00', '23:00:00'),
+(@room1_id, 'Saturday', '09:00:00', '23:00:00'),
+(@room1_id, 'Sunday', '09:00:00', '22:00:00'),
+
+-- Cyberpunk Heist - Limited weekday hours
+(@room2_id, 'Wednesday', '14:00:00', '22:00:00'),
+(@room2_id, 'Thursday', '14:00:00', '22:00:00'),
+(@room2_id, 'Friday', '14:00:00', '23:00:00'),
+(@room2_id, 'Saturday', '10:00:00', '23:00:00'),
+(@room2_id, 'Sunday', '10:00:00', '22:00:00'),
+
+-- Pirate's Cove - Weekend and evening slots only
+(@room3_id, 'Friday', '17:00:00', '23:00:00'),
+(@room3_id, 'Saturday', '09:00:00', '23:00:00'),
+(@room3_id, 'Sunday', '09:00:00', '22:00:00');
+
 -- 4. Insert Puzzles
 -- Haunted Mansion Puzzles
 INSERT INTO Puzzles (roomID, name, description, puzzleType) VALUES 
@@ -83,6 +106,29 @@ INSERT INTO Puzzles (roomID, name, description, puzzleType) VALUES
 INSERT INTO Puzzles (roomID, name, description, puzzleType) VALUES 
 (@room2_id, 'Firewall Breach', 'Hack the terminal by solving the binary sequence.', 'Digital'),
 (@room2_id, 'Laser Grid', 'Navigate the laser maze without tripping the alarm.', 'Physical');
+
+-- 4.5. Insert Puzzle Hints with sequence numbers
+-- Haunted Mansion - Ghostly Piano hints
+INSERT INTO Puzzle_Hints (puzzleID, hintSequence, hintText, timeToTriggerSeconds) VALUES
+((SELECT puzzleID FROM Puzzles WHERE name = 'Ghostly Piano'), 1, 'Look at the sheet music on the piano stand.', 300),
+((SELECT puzzleID FROM Puzzles WHERE name = 'Ghostly Piano'), 2, 'The notes spell out a word when read backwards.', 600),
+((SELECT puzzleID FROM Puzzles WHERE name = 'Ghostly Piano'), 3, 'Play only the black keys in the highlighted pattern.', 900);
+
+-- Haunted Mansion - Portrait Puzzle hints
+INSERT INTO Puzzle_Hints (puzzleID, hintSequence, hintText, timeToTriggerSeconds) VALUES
+((SELECT puzzleID FROM Puzzles WHERE name = 'Portrait Puzzle'), 1, 'Check the dates on the portraits carefully.', 300),
+((SELECT puzzleID FROM Puzzles WHERE name = 'Portrait Puzzle'), 2, 'Arrange them from oldest to newest, left to right.', 600);
+
+-- Cyberpunk Heist - Firewall Breach hints
+INSERT INTO Puzzle_Hints (puzzleID, hintSequence, hintText, timeToTriggerSeconds) VALUES
+((SELECT puzzleID FROM Puzzles WHERE name = 'Firewall Breach'), 1, 'Binary sequences can be converted to letters.', 240),
+((SELECT puzzleID FROM Puzzles WHERE name = 'Firewall Breach'), 2, 'The ASCII table is your friend.', 480),
+((SELECT puzzleID FROM Puzzles WHERE name = 'Firewall Breach'), 3, 'The password is a 4-letter word.', 720);
+
+-- Cyberpunk Heist - Laser Grid hints
+INSERT INTO Puzzle_Hints (puzzleID, hintSequence, hintText, timeToTriggerSeconds) VALUES
+((SELECT puzzleID FROM Puzzles WHERE name = 'Laser Grid'), 1, 'Use the mirrors to redirect the beams.', 300),
+((SELECT puzzleID FROM Puzzles WHERE name = 'Laser Grid'), 2, 'The safe path follows the floor tiles lighting pattern.', 600);
 
 -- 5. Insert Bookings & Invoices (Past & Future)
 

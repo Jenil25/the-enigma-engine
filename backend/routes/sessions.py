@@ -47,14 +47,18 @@ def end_session(session_id):
 @sessions_bp.route('/<int:session_id>/hint', methods=['POST'])
 def log_hint(session_id):
     data = request.json
-    hint_id = data.get('hintId')
+    puzzle_id = data.get('puzzleId')
+    hint_sequence = data.get('hintSequence')
+
+    if not puzzle_id or not hint_sequence:
+        return jsonify({"error": "puzzleId and hintSequence are required"}), 400
 
     db = get_db()
     cursor = db.cursor()
     try:
         cursor.execute(
-            "INSERT INTO Session_Hints_Used (sessionID, hintID, timestampHintGiven) VALUES (%s, %s, NOW())",
-            (session_id, hint_id)
+            "INSERT INTO Session_Hints_Used (sessionID, puzzleID, hintSequence, timestampHintGiven) VALUES (%s, %s, %s, NOW())",
+            (session_id, puzzle_id, hint_sequence)
         )
         db.commit()
         return jsonify({"message": "Hint logged"}), 201
