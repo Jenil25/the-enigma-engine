@@ -10,7 +10,7 @@ def get_db_config():
         'host': os.getenv('DB_HOST', 'localhost'),
         'user': os.getenv('DB_USER', 'root'),
         'password': os.getenv('DB_PASSWORD', 'password'),
-        'database': os.getenv('DB_NAME', 'enigma_engine'),
+        'database': os.getenv('DB_NAME', 'enigma_engine_db'),
         'port': int(os.getenv('DB_PORT', 3306)),
         'cursorclass': pymysql.cursors.DictCursor
     }
