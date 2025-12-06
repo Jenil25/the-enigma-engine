@@ -4,7 +4,7 @@
 -- Usage: mysql -u root -p enigma_db < backend/seed_data.sql
 -- =============================================
 
-USE enigma_engine_db;
+USE enigma_engine;
 
 -- 1. Clean up existing data (Optional - be careful!)
 -- TRUNCATE TABLE Session_Hints_Used;

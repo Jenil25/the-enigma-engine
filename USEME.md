@@ -38,7 +38,7 @@ cd the-enigma-engine
 4.  **Import Schema**:
     - The application automatically initializes the schema if tables don't exist, but you can manually import it:
       ```bash
-      mysql -u root -p enigma_engine_db < backend/schema.sql
+      mysql -u root -p enigma_engine < backend/schema.sql
       ```
 
 ## 3. Backend Setup (Flask)
