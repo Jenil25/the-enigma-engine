@@ -1,0 +1,16 @@
+annotated-types==0.7.0
+blinker==1.9.0
+click==8.3.1
+cryptography
+flask==3.1.2
+flask-cors==6.0.1
+itsdangerous==2.2.0
+jinja2==3.1.6
+markupsafe==3.0.3
+pymysql
+pydantic==2.12.5
+pydantic-core==2.41.5
+python-dotenv==1.2.1
+typing-extensions==4.15.0
+typing-inspection==0.4.2
+werkzeug==3.1.4
