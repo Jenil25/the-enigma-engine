@@ -14,16 +14,6 @@
 - **Database**: SQL (SQLite/MySQL)
 - **Containerization**: Docker
 
-## Getting Started
-
-See [deploy.md](deploy.md) for detailed deployment and running instructions.
-
-## Project Structure
-- `frontend/`: Next.js application
-- `backend/`: Flask API and Database logic
-- `features.md`: Detailed feature list
-- `Changes.md`: Log of project changes and decisions
-
 ## Authors
 - Helly Niteshbhai Diyora
 - Jenil Pankajkumar Mahyavanshi
